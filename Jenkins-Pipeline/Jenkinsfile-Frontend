@@ -18,29 +18,13 @@ pipeline {
                     withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 
                       sh '''
                     	   git config --global user.name "techprakashtp"
-			   git config --global user.email "jyotiprakashnk49@gmail.com"         
+			   git config --global user.email "jyotiprakashnk49@gmail.com"  
         		 ''' 
                         }
           	    }
             	}
        	    }  
   	}	
-
-    stage('SonarQube Analysis') {
-	steps {
-          dir('ToDo-Frontend-App') {
-             withSonarQubeEnv('Sonar-Scanner') {
-                        sh ''' 
-       			  $SCANNER_HOME/bin/sonar-scanner \
- 			  -Dsonar.projectKey=ThreeTierApp-Deployment \
- 			  -Dsonar.projectName=ThreeTierApp-Deployment  \
-  			  -Dsonar.host.url=http://172.17.0.2:9000 \
-  			  -Dsonar.login=sonar-scaner-token
-  			'''
-		     }
-                }
-            }
-        }
 
      stage('SonarQube Analysis') {
             steps {
@@ -70,7 +54,6 @@ pipeline {
             }
         }
 		
-   
         stage('Push to DockerHub') {
             steps {
                 script {
@@ -81,7 +64,6 @@ pipeline {
                 }
             }
     	}
-
 
         stage('Running Image') {
             steps {
