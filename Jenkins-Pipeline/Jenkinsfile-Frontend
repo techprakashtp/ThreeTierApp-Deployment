@@ -1,67 +1,75 @@
 pipeline {
   
-  	   environment {
+  	environment {
     	  Repo_Name='jprakash1/todoapp-frontend'
     	  Container_Name = 'my-container'
     	  IMAGE_TAG='v2.0'
     	  GITHUB_TOKEN = credentials('github_token')
     	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
-  	    }
+  	 }
   
     agent any
   
-    stages {         
-        stage('Checkout Git') {
-          steps {
-       	        script {
-                    checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-
-                    withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) {
-                    
+ stages {         
+    stage('Checkout Git') {
+        steps {
+       	    script {
+             checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
+                    withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 
                       sh '''
-
-                    	git config --global user.name "techprakashtp"
-						git config --global user.email "jyotiprakashnk49@gmail.com"         
-                        
-                       ''' 
-                      
-                    }
-          
+                    	   git config --global user.name "techprakashtp"
+			   git config --global user.email "jyotiprakashnk49@gmail.com"         
+        		 ''' 
+                        }
+          	    }
             	}
        	    }  
-  		}
+  	}	
 
+    stage('SonarQube Analysis') {
+	steps {
+          dir('ToDo-Frontend-App') {
+             withSonarQubeEnv('Sonar-Scanner') {
+                        sh ''' 
+       			  $SCANNER_HOME/bin/sonar-scanner \
+ 			  -Dsonar.projectKey=ThreeTierApp-Deployment \
+ 			  -Dsonar.projectName=ThreeTierApp-Deployment  \
+  			  -Dsonar.host.url=http://172.17.0.2:9000 \
+  			  -Dsonar.login=sonar-scaner-token
+  			'''
+		     }
+                }
+            }
+        }
 
-  		  stage('SonarQube Analysis') {
+     stage('SonarQube Analysis') {
             steps {
             	dir('ToDo-Frontend-App') {
                     withSonarQubeEnv('Sonar-Scanner') {
 
                         sh ''' 
-       					  $SCANNER_HOME/bin/sonar-scanner \
- 						  -Dsonar.projectKey=ThreeTierApp-Deployment \
- 						  -Dsonar.projectName=ThreeTierApp-Deployment  \
-  						  -Dsonar.host.url=http://172.17.0.2:9000 \
-  						  -Dsonar.login=sonar-scaner-token
-
-  					}	'''
+       			  $SCANNER_HOME/bin/sonar-scanner \
+ 			  -Dsonar.projectKey=ThreeTierApp-Deployment \
+ 			  -Dsonar.projectName=ThreeTierApp-Deployment  \
+  			  -Dsonar.host.url=http://172.17.0.2:9000 \
+  			  -Dsonar.login=sonar-scaner-token
+  			'''
+		    }
                 }
             }
         }
 
-        	dir('ToDo-Frontend-App') {
-                    withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
-
-    	stage('Build Image') {         
-  		    steps{  
-                script {  
-                    dir('ToDo-Frontend-App') {
+    stage('Build Image') {         
+             steps{  
+                 script {  
+                     dir('ToDo-Frontend-App') {
                         docker.build "${Repo_Name}:${BUILD_NUMBER}"
-                    }    echo 'Build Image Completed'   
-           		}
-           	}
-        }   		
+                        echo 'Build Image Completed'   
+		   }
+                }
+            }
+        }
+		
    
         stage('Push to DockerHub') {
             steps {
