@@ -1,0 +1,59 @@
+
+pipeline {
+  
+  environment {
+    Repo_Name='jprakash1/todoapp-backend'
+    Container_Name = 'my-container-api'
+    IMAGE_TAG='v2.0'
+    GITHUB_CREDENTIALS = credentials('github-credentials')
+    DOCKER_HUB_TOKEN = credentials('docker-hub-token')
+  }
+  
+  agent any
+  
+  stages {         
+    stage('Checkout from Git') {
+       steps {
+          checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://		github.com/techprakashtp/ThreeTierApp-Deployment.git']])
+                
+            }
+        }
+  
+    stage('Build Docker Image') {         
+       steps{  
+         script {  
+         dir('ToDo-Backend-App') {
+        docker.build "${Repo_Name}:${BUILD_NUMBER}"
+        echo 'Build Image Completed'   
+           }
+         }
+      }       
+   }
+    
+    stage('Running image') {
+       steps {
+         sh "docker run -d --name ${Container_Name} ${Repo_Name}:${BUILD_NUMBER}"
+       }         
+    }
+        
+    stage('Stop Remove Container') {
+       steps {
+         sh "docker stop ${Container_Name}"
+         sh "docker rm ${Container_Name}"
+       }           
+    }
+    
+      stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
+                        docker.image("${Repo_Name}:${BUILD_NUMBER}").push()
+                        echo 'Push Docker Image to Docker Hub Completed'
+                    }
+                }
+            }
+    	}
+    	
+    }
+ } 
+
