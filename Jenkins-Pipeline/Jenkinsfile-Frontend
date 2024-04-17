@@ -14,8 +14,8 @@ pipeline {
   stages {         
     stage('Checkout from Git') {
        steps {
-          checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://		github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-                
+          git branch: 'main', credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git'
+          checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
             }
         }
   
