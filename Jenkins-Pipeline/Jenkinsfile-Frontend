@@ -60,7 +60,7 @@ pipeline {
                     
                     sh '''
                     	git config --global user.name "techprakashtp"
-						git config --global user.email "jyotiprakashnk49@gmail.com"         
+			git config --global user.email "jyotiprakashnk49@gmail.com"         
                         
                         
                        ''' 
