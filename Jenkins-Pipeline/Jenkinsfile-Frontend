@@ -1,3 +1,5 @@
+
+
 pipeline {
   
   environment {
@@ -11,13 +13,13 @@ pipeline {
   agent any
   
   stages {         
-    stage('Checkout from Git') {
+    stage('Checkout SCM') {
        steps {
           checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
             }
         }
   
-    stage('Build Docker Image') {         
+    stage('Build Image') {         
        steps{  
          script {  
          dir('ToDo-Frontend-App') {
@@ -28,20 +30,20 @@ pipeline {
       }       
    }
     
-    stage('Running image') {
+    stage('Running Image') {
        steps {
          sh "docker run -d --name ${Container_Name} ${Repo_Name}:${BUILD_NUMBER}"
        }         
     }
         
-    stage('Stop Remove Container') {
+    stage('Stop Container') {
        steps {
          sh "docker stop ${Container_Name}"
          sh "docker rm ${Container_Name}"
        }           
     }
     
-      stage('Push Docker Image to Docker Hub') {
+      stage('Push to DockerHub') {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
@@ -60,7 +62,7 @@ pipeline {
                     
                     sh '''
                     	git config --global user.name "techprakashtp"
-			git config --global user.email "jyotiprakashnk49@gmail.com"         
+						git config --global user.email "jyotiprakashnk49@gmail.com"         
                         
                         
                        ''' 
