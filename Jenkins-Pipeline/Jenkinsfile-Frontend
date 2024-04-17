@@ -34,12 +34,24 @@ pipeline {
 
   		  stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube Server') {
-                    sh 'sonar-scanner'
+            	dir('ToDo-Frontend-App') {
+                    withSonarQubeEnv('Sonar-Scanner') {
+
+                        sh ''' 
+       					  $SCANNER_HOME/bin/sonar-scanner \
+ 						  -Dsonar.projectKey=ThreeTierApp-Deployment \
+ 						  -Dsonar.projectName=ThreeTierApp-Deployment  \
+  						  -Dsonar.host.url=http://172.17.0.2:9000 \
+  						  -Dsonar.login=sonar-scaner-token
+
+  					}	'''
                 }
             }
         }
 
+        	dir('ToDo-Frontend-App') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
 
     	stage('Build Image') {         
   		    steps{  
@@ -72,8 +84,7 @@ pipeline {
         stage('Stop Container') {
             steps {
                sh "docker stop ${Container_Name}"
-               sh "docker rm ${Container_Name}"
             }           
         }    	
     }
-} 
+}
