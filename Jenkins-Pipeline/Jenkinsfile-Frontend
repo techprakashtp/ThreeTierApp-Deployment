@@ -8,7 +8,7 @@ pipeline {
 
   	environment {
     	  Repo_Name='jprakash1/todoapp-frontend'
-    	  Container_Name = 'my-container'
+    	  Container_Name = 'my-container-frontend'
     	  IMAGE_TAG='v2.0'
     	  GITHUB_TOKEN = credentials('github_token')
     	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
