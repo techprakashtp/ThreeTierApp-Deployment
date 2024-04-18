@@ -39,9 +39,7 @@ pipeline {
                         sh ''' 
        			  $SCANNER_HOME/bin/sonar-scanner \
  			  -Dsonar.projectKey=ThreeTierApp-Deployment \
- 			  -Dsonar.projectName=ThreeTierApp-Deployment  \
-  			  -Dsonar.host.url=http://172.17.0.2:9000 \
-  			  -Dsonar.login=sqa_13a9b22fdfc947bc5bcccbc5c20c8975cf43815c
+ 			  -Dsonar.projectName=ThreeTierApp-Deployment 
   			'''
 		    }
                 }
