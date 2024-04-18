@@ -1,14 +1,19 @@
 pipeline {
-  
+     agent any
+
+      tools{
+	     jdk  'jdk17'
+	     maven 'maven3'
+	   }
+
   	environment {
     	  Repo_Name='jprakash1/todoapp-frontend'
     	  Container_Name = 'my-container'
     	  IMAGE_TAG='v2.0'
     	  GITHUB_TOKEN = credentials('github_token')
     	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
+	  SCANNER_HOME= tool 'Sonar-Scanner'
   	 }
-  
-    agent any
   
  stages {         
     stage('Checkout Git') {
@@ -28,6 +33,7 @@ pipeline {
      stage('SonarQube Analysis') {
             steps {
             	dir('ToDo-Frontend-App') {
+			
                     withSonarQubeEnv('Sonar-Scanner') {
 
                         sh ''' 
@@ -35,7 +41,7 @@ pipeline {
  			  -Dsonar.projectKey=ThreeTierApp-Deployment \
  			  -Dsonar.projectName=ThreeTierApp-Deployment  \
   			  -Dsonar.host.url=http://172.17.0.2:9000 \
-  			  -Dsonar.login=sonar-scaner-token
+  			  -Dsonar.login=sqa_13a9b22fdfc947bc5bcccbc5c20c8975cf43815c
   			'''
 		    }
                 }
