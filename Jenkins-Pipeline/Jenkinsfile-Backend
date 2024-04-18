@@ -1,59 +1,81 @@
-
 pipeline {
+     agent any
+
+      tools{
+	     jdk  'jdk17'
+	     maven 'maven3'
+	   }
+
+  	environment {
+    	  Repo_Name='jprakash1/todoapp-backend'
+    	  Container_Name = 'my-container'
+    	  IMAGE_TAG='v2.0'
+    	  GITHUB_TOKEN = credentials('github_token')
+    	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
+	  SCANNER_HOME= tool 'sonarqube'
+  	 }
   
-  environment {
-    Repo_Name='jprakash1/todoapp-backend'
-    Container_Name = 'my-container-api'
-    IMAGE_TAG='v2.0'
-    GITHUB_CREDENTIALS = credentials('github-credentials')
-    DOCKER_HUB_TOKEN = credentials('docker-hub-token')
-  }
-  
-  agent any
-  
-  stages {         
-    stage('Checkout from Git') {
-       steps {
-          checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://		github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-                
+ stages {         
+    stage('Checkout Git') {
+        steps {
+       	    script {
+             checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
+                    withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 
+                      sh '''
+                    	   git config --global user.name "techprakashtp"
+			                   git config --global user.email "jyotiprakashnk49@gmail.com"  
+        		           ''' 
+                        }
+          	    }
+            	}
+       	    }  	
+
+     stage('SonarQube Analysis') {
+            steps {
+            	dir('ToDo-Backend-App') {
+                    withSonarQubeEnv('sonarqube') {
+       sh ''' 
+       	 $SCANNER_HOME/bin/sonar-scanner \
+ 			  -Dsonar.projectKey=ThreeTierApp-Deployment \
+ 			  -Dsonar.projectName=ThreeTierApp-Deployment 
+  			 '''
+		    }
+                }
             }
         }
-  
-    stage('Build Docker Image') {         
-       steps{  
-         script {  
-         dir('ToDo-Backend-App') {
-        docker.build "${Repo_Name}:${BUILD_NUMBER}"
-        echo 'Build Image Completed'   
-           }
-         }
-      }       
-   }
-    
-    stage('Running image') {
-       steps {
-         sh "docker run -d --name ${Container_Name} ${Repo_Name}:${BUILD_NUMBER}"
-       }         
-    }
-        
-    stage('Stop Remove Container') {
-       steps {
-         sh "docker stop ${Container_Name}"
-         sh "docker rm ${Container_Name}"
-       }           
-    }
-    
-      stage('Push Docker Image to Docker Hub') {
+
+    stage('Build Image') {         
+             steps{  
+                 script {  
+                     dir('ToDo-Backend-App') {
+                        docker.build "${Repo_Name}:${BUILD_NUMBER}"
+                        echo 'Build Image Completed'   
+		   }
+                }
+            }
+        }
+		
+        stage('Push to DockerHub') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
+               	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                         docker.image("${Repo_Name}:${BUILD_NUMBER}").push()
                         echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
             }
     	}
-    	
-    }
- } 
 
+        stage('Running Image') {
+            steps {
+              sh "docker run -d --name ${Container_Name} ${Repo_Name}:${BUILD_NUMBER}"
+            }         
+        }
+        
+        stage('Stop Container') {
+            steps {
+               sh "docker stop ${Container_Name}"
+            }           
+        }    	
+    }
+}
