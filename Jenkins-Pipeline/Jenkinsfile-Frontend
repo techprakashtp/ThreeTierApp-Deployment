@@ -12,7 +12,7 @@ pipeline {
     	  IMAGE_TAG='v2.0'
     	  GITHUB_TOKEN = credentials('github_token')
     	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
-	  SCANNER_HOME= tool 'Sonar-Scanner'
+	  SCANNER_HOME= tool 'sonar-scanner'
   	 }
   
  stages {         
@@ -34,7 +34,7 @@ pipeline {
             steps {
             	dir('ToDo-Frontend-App') {
 			
-                    withSonarQubeEnv('Sonar-Scanner') {
+                    withSonarQubeEnv('sonarqube') {
 
                         sh ''' 
        			  $SCANNER_HOME/bin/sonar-scanner \
