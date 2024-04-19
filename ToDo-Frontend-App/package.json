@@ -25,7 +25,6 @@
   },
   "jest": {
     "collectCoverage": true,
-    "coverageReporters": ["json", "html"],
     "testEnvironment":  "node",
     "coveragePathIgnorePatterns": [
         "/node_modules/"
