@@ -17,9 +17,10 @@
   "scripts": {
     "start:dev": "node src/index.js",
     "test:dev": "jest --coverage",
+    "test": "jest",
+    "test-coverage": "jest --coverage",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject"
     
   },
