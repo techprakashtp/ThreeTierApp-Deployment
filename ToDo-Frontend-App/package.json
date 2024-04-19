@@ -17,7 +17,7 @@
   "scripts": {
     "start:dev": "node src/index.js",
     "test:dev": "jest --coverage",
-    "test": "jest",
+    "test": "nyc mocha"
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject"
