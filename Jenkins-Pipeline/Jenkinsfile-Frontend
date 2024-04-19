@@ -40,6 +40,12 @@ pipeline {
        			  $SCANNER_HOME/bin/sonar-scanner \
  			  -Dsonar.projectKey=ThreeTierApp-Deployment \
  			  -Dsonar.projectName=ThreeTierApp-Deployment \
+			  -Donar.sources=src\
+			  -Dsonar.tests=src\
+			  -Dsonar.test.inclusions=src/**/*.spec.js,src/**/*.test.js\
+			  -Dsonar.javascript.lcov.reportPaths=coverage/jest/lcov.info\
+			  -Dsonar.testExecutionReportPaths=coverage/jest/testlog.xml
+
   			'''
 		    }
                 }
