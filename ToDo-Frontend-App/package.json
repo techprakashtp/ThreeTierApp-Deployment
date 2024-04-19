@@ -15,10 +15,25 @@
     "webpack": "^5.91.0"
   },
   "scripts": {
+    "start:dev": "node src/index.js",
+    "test:dev": "jest --coverage",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+    
+  },
+  "jest": {
+    "testEnvironment":  "node",
+    "coveragePathIgnorePatterns": [
+        "/node_modules/"
+    ],
+    "testResultsProcessor":  "jest-sonar-reporter"
+  },
+  "jestSonar": {
+    "reportPath":  "coverage",
+    "reportFile":  "test-reporter.xml",
+    "indent":  2
   },
   "eslintConfig": {
     "extends": [
