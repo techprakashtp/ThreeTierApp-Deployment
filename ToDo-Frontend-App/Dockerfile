@@ -9,9 +9,10 @@
  COPY . .
  
  RUN rm -Rf node_modules
+  
+ RUN npm install -y
  
- RUN npm install 
- 
+ RUN npm install jest @types/jest express supertest --dev
  
  # Second Stage
  FROM node:14-slim AS production
@@ -23,7 +24,6 @@
  EXPOSE 3000
  
  CMD [ "npm", "start" ]
-
 
 
 
