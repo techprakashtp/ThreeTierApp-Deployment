@@ -12,7 +12,7 @@
   
  RUN npm install -y
 
- RUN npm install --save-dev nyc
+ RUN npm install jest @types/jest express supertest --dev
  
  # Second Stage
  FROM node:14-slim AS production
