@@ -11,8 +11,8 @@
  RUN rm -Rf node_modules
   
  RUN npm install -y
- 
- RUN npm install --save-dev jest
+
+ RUN npm install --save-dev nyc
  
  # Second Stage
  FROM node:14-slim AS production
