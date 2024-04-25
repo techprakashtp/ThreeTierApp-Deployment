@@ -7,9 +7,8 @@ pipeline {
 	   }
 
   	environment {
-    	  Repo_Name='jprakash1/todoapp-frontend'
-    	  Container_Name = 'my-container-frontend'
-    	  IMAGE_TAG='v2.0'
+    	  Image_Name='jprakash1/todoapp-frontend'
+    	  Container_Name = 'todofrontend-container'
     	  GITHUB_TOKEN = credentials('github_token')
     	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
 	  SCANNER_HOME= tool 'sonarqube'
@@ -51,7 +50,7 @@ pipeline {
              steps{  
                  script {  
                      dir('ToDo-Frontend-App') {
-                        docker.build "${Repo_Name}:${BUILD_NUMBER}"
+                        docker.build "${Image_Name}"
                         echo 'Build Image Completed'   
 		   }
                 }
@@ -62,12 +61,42 @@ pipeline {
             steps {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
-                        docker.image("${Repo_Name}:${BUILD_NUMBER}").push()
+                        docker.image("${Image_Name}").push()
                         echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
             }
     	}
+
+stage('Update k8s Manifest') {
+		 environment {
+                GIT_REPONAME = "ThreeTierApp-Deployment.git"
+                GIT_USERNAME = "techprakashtp"
+           		 }
+        steps {
+       	    script {
+             checkout scmGit(branches: [[name: '*/ops-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
+
+             dir('K8S-Manifest/Frontend') {
+                    withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 	
+
+                       			  sh '''
+                    	  			 git config --global user.name "techprakashtp"
+			   			   git config --global user.email "jyotiprakashnk49@gmail.com"  
+			   			   cat deployment.yaml
+			   			   sed -i 's+${Image_Name}.*+${Image_Name}:$(DOCKERTAG)+g' deployment.yaml
+			   			   cat deployment.yaml
+			   			   git add .
+			   			   git commit -m 'changed manifest done by jenkins job:(env.BUILD_NUMBER)'
+			   			   
+			   			   git push https://${github_token}@github.com/${GIT_USERNAME}/${GIT_REPONAME} HEAD:ops-branch1
+
+        			}		 ''' 
+
+                }
+           }
+       }
+    } 
 
         stage('Running Image') {
             steps {
