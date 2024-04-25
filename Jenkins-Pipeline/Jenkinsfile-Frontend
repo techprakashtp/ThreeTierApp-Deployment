@@ -71,7 +71,7 @@ pipeline {
 
         stage('UpdateManifest') {
 		        environment {
-                  GIT_REPONAME = "ThreeTierApp-Deployment.git"
+                  GIT_REPONAME = "ThreeTierApp-Deployment"
                   GIT_USERNAME = "techprakashtp"
            	    }
             steps {
