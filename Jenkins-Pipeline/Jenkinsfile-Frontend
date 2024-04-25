@@ -20,12 +20,12 @@ pipeline {
        	       script {
                     checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
                         withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 
-                          sh '''
-                    	   git config --global user.name "techprakashtp"
+                               sh '''
+                    		      git config --global user.name "techprakashtp"
 			               git config --global user.email "jyotiprakashnk49@gmail.com"  
         	          	   ''' 
                         }
-          	        }
+          	     }
             	}
        	    }  	
 
@@ -35,8 +35,8 @@ pipeline {
 			
                     withSonarQubeEnv('sonarqube') {
 
-                     sh ''' 
-       			      $SCANNER_HOME/bin/sonar-scanner \
+                         sh ''' 
+       			         $SCANNER_HOME/bin/sonar-scanner \
  			         -Dsonar.projectKey=ThreeTierApp-Deployment \
  			         -Dsonar.projectName=ThreeTierApp-Deployment \
 			         -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
@@ -81,16 +81,17 @@ pipeline {
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 	
 
-                       	  sh '''
-                    	  	 git config --global user.name "techprakashtp"
-			   			     git config --global user.email "jyotiprakashnk49@gmail.com"  
-			   			     cat deployment.yaml
-			   			     sed -i 's+${Image_Name}.*+${Image_Name}:$(DOCKERTAG)+g' deployment.yaml
-			   			     cat deployment.yaml
-			   			     git add .
-			   			     git commit -m 'changed manifest done by jenkins job:(env.BUILD_NUMBER)'
-			   			     git push https://${github_token}@github.com/${GIT_USERNAME}/${GIT_REPONAME} HEAD:ops-branch1
-        			    	''' 
+                                      sh '''
+                    	  	 	 git config --global user.name "techprakashtp"
+			   		 git config --global user.email "jyotiprakashnk49@gmail.com"  
+			   		 cat deployment.yaml
+			   		 sed -i 's+${Image_Name}.*+${Image_Name}:$(DOCKERTAG)+g' deployment.yaml
+			   		 cat deployment.yaml
+			   		 git add .
+			   		 git commit -m 'changed manifest done by jenkins job:(env.BUILD_NUMBER)'
+			   	         git push https://${github_token}@github.com/${GIT_USERNAME}/${GIT_REPONAME} HEAD:ops-branch1
+
+        			        ''' 
                         }
                     }
                 }
