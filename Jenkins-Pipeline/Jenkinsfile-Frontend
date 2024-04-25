@@ -83,7 +83,7 @@ pipeline {
 			   		 sed -i 's+${Image_Name}.*+${Image_Name}:$(DOCKERTAG)+g' deployment.yaml
 			   		 cat deployment.yaml
 			   		 git add deployment.yaml
-			   		 git commit -m 'changed manifest done by jenkins job:${BUILD_NUMBER}'
+			   		 git commit -m "changed manifest done by jenkins job \${BUILD_NUMBER}"
 			   	         git push https://${github_token}@github.com/${GIT_USERNAME}/${GIT_REPONAME}HEAD:ops-branch1
 
         			        ''' 
