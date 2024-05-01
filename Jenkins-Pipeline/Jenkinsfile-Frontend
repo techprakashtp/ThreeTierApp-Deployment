@@ -8,10 +8,12 @@ pipeline {
 
   	environment {
     	  IMAGE_NAME='jprakash1/todoapp-frontend'
+          MAJOR_VERSION='1'
+          MINOR_VERSION='0'
     	  CONTAINER_NAME = 'todofrontend-container'
     	  GITHUB_CRED = credentials('github-cred')
     	  DOCKERHUB_CRED_ = credentials('docker-hub-cred')
-	  SCANNER_HOME= tool 'sonarqube'
+	      SCANNER_HOME= tool 'sonarqube'
   	    }
   
     stages {         
@@ -29,8 +31,9 @@ pipeline {
             steps{  
                 script {  
                     dir('ToDo-Frontend-App') {
-                        docker.build "${IMAGE_NAME}"
-                        echo 'Build Image Completed'   
+                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
+                    docker.build "${IMAGE_NAME}:${buildVersion}"
+                    echo 'Build Image Completed'   
 		            }
                 }
             }
@@ -40,8 +43,9 @@ pipeline {
             steps {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
-                        docker.image("${IMAGE_NAME}").push()
-                        echo 'Push Docker Image to Docker Hub Completed'
+                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
+                    docker.image("${IMAGE_NAME}:${buildVersion}").push()
+                    echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
             }
@@ -59,9 +63,9 @@ pipeline {
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
 
-                    sh '''
-                    git config user.name "techprakashtp"
-		    git config user.email "jyotiprakashnk49@gmail.com"  
+                sh '''
+                   git config user.name "techprakashtp"
+		   git config user.email "jyotiprakashnk49@gmail.com"  
 
 		    BUILD_NUMBER=${BUILD_NUMBER}
                     echo $BUILD_NUMBER
@@ -76,7 +80,7 @@ pipeline {
 			
                     git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
-        	   ''' 
+        	     ''' 
                         }
                     }
                 }
