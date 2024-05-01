@@ -72,7 +72,7 @@ pipeline {
 
                     ImageTag=$(grep -oP '(?<=frontend:)[^ ]+' deployment.yaml)
 
-                    sed -i "s/${IMAGE_NAME}:${ImageTag}/${IMAGE_NAME}:${BUILD_NUMBER}/" deployment.yaml  
+                    sed -i "s/${IMAGE_NAME}/${IMAGE_NAME}:${BUILD_NUMBER}/" deployment.yaml  
 
                     git add deployment.yaml
 
