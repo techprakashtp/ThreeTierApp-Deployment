@@ -68,7 +68,7 @@ pipeline {
                     git config user.name "techprakashtp"
 		    git config user.email "jyotiprakashnk49@gmail.com"  
 
-                    sed -i 's/${IMAGE_NAME}:${PLACEHOLDER_TAG}/${IMAGE_NAME}:${IMAGE_TAG}/g' deployment.yaml 
+                    sed -i 's/${IMAGE_NAME}:${PLACEHOLDER_TAG}/${IMAGE_NAME}:${IMAGE_TAG}/g' K8S-Manifest/Frontend/deployment.yaml 
                     git add deployment.yaml
 
                     git commit -m "Update k8s deployment manifest file Image to version \${IMAGE_TAG}"
