@@ -6,12 +6,12 @@ pipeline {
 	     maven 'maven3'
 	    }
 
-  	    environment {
-    	  Image_Name='jprakash1/todoapp-frontend'
-    	  Container_Name = 'todofrontend-container'
+  	environment {
+    	  IMAGE_NAME='jprakash1/todoapp-frontend'
+    	  CONTAINER_NAME = 'todofrontend-container'
     	  GITHUB_CRED = credentials('github-cred')
     	  DOCKERHUB_CRED_ = credentials('docker-hub-cred')
-	      SCANNER_HOME= tool 'sonarqube'
+	  SCANNER_HOME= tool 'sonarqube'
   	    }
   
     stages {         
@@ -29,7 +29,7 @@ pipeline {
             steps{  
                 script {  
                     dir('ToDo-Frontend-App') {
-                        docker.build "${Image_Name}"
+                        docker.build "${IMAGE_NAME}"
                         echo 'Build Image Completed'   
 		            }
                 }
@@ -40,7 +40,7 @@ pipeline {
             steps {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
-                        docker.image("${Image_Name}").push()
+                        docker.image("${IMAGE_NAME}").push()
                         echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
@@ -48,7 +48,7 @@ pipeline {
     	}
 
         stage('UpdateManifest') {
-		        environment {
+		  environment {
                   GIT_REPO_NAME = "ThreeTierApp-Deployment"
                   GIT_USER_NAME = "techprakashtp"
            	    }
@@ -66,10 +66,10 @@ pipeline {
 		    BUILD_NUMBER=${BUILD_NUMBER}
                     echo $BUILD_NUMBER
 
-                    imageTag=$(grep -oP '(?<=frontend:)[^ ]+' deployment.yaml)
-                    echo $imageTag
+                    ImageTag=$(grep -oP '(?<=frontend:)[^ ]+' deployment.yaml)
+                    echo $ImageTag
 
-                    sed -i "s/${Image_Name}:${imageTag}/${Image_Name}:${BUILD_NUMBER}/" deployment.yaml  
+                    sed -i "s/${IMAGE_NAME}:${ImageTag}/${IMAGE_NAME}:${BUILD_NUMBER}/" deployment.yaml  
 
                     git add deployment.yaml
 
@@ -86,13 +86,13 @@ pipeline {
 
         stage('Running Image') {
             steps {
-              sh "docker run -d --name ${Container_Name} ${Repo_Name}:${BUILD_NUMBER}"
+              sh "docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${BUILD_NUMBER}"
             }         
         }
         
         stage('Stop Container') {
             steps {
-               sh "docker stop ${Container_Name}"
+               sh "docker stop ${CONTAINER_NAME}"
             }           
         }    	
     }
