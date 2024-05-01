@@ -31,7 +31,7 @@ pipeline {
             steps{  
                 script {  
                     dir('ToDo-Frontend-App') {
-                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
+                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}"
                     docker.build "${IMAGE_NAME}:${buildVersion}"
                     echo 'Build Image Completed'   
 		            }
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
-                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
+                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}"
                     docker.image("${IMAGE_NAME}:${buildVersion}").push()
                     echo 'Push Docker Image to Docker Hub Completed'
                     }
@@ -70,7 +70,7 @@ pipeline {
 
                     sed -i 's/${IMAGE_NAME}:${PLACEHOLDER_TAG}/${IMAGE_NAME}:${IMAGE_TAG}/g' deployment.yaml 
 		    cat deployment.yaml 
-                    git add .
+                    git add *.yaml
 
                     git commit -m "Update k8s deployment manifest file Image to version \${IMAGE_TAG}"
                     git push https://${GIT_USER_NAME}:${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
