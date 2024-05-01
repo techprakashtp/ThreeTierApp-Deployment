@@ -9,8 +9,8 @@ pipeline {
   	    environment {
     	  Image_Name='jprakash1/todoapp-frontend'
     	  Container_Name = 'todofrontend-container'
-    	  GITHUB_TOKEN = credentials('github_token')
-    	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
+    	  GITHUB_CRED = credentials('github-cred')
+    	  DOCKERHUB_CRED_ = credentials('docker-hub-cred')
 	      SCANNER_HOME= tool 'sonarqube'
   	    }
   
@@ -24,24 +24,7 @@ pipeline {
             	}
        	    }  	
 
-        stage('SonarQube Analysis') {
-            steps {
-            	dir('ToDo-Frontend-App') {
-			
-                    withSonarQubeEnv('sonarqube') {
-
-                         sh ''' 
-       			         $SCANNER_HOME/bin/sonar-scanner \
- 			         -Dsonar.projectKey=ThreeTierApp-Deployment \
- 			         -Dsonar.projectName=ThreeTierApp-Deployment \
-			         -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
-
-  		        	 '''
-		            }
-                }
-            }
-        }
-
+        
         stage('Build Image') {         
             steps{  
                 script {  
@@ -66,8 +49,8 @@ pipeline {
 
         stage('UpdateManifest') {
 		        environment {
-                  GIT_REPONAME = "ThreeTierApp-Deployment"
-                  GIT_USERNAME = "techprakashtp"
+                  GIT_REPO_NAME = "ThreeTierApp-Deployment"
+                  GIT_USER_NAME = "techprakashtp"
            	    }
             steps {
        	        script {
@@ -76,17 +59,25 @@ pipeline {
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
 
-                                      sh '''
-                    	  	 	 git config user.name "techprakashtp"
-			   		 git config user.email "jyotiprakashnk49@gmail.com"  
-			   		 
-			   		 sed -i 's+${Image_Name}.*+${Image_Name}:$(DOCKERTAG)+g' deployment.yaml
-			   		
-			   		 git add deployment.yaml
-			   		 git commit -m "changed manifest done by jenkins job \${BUILD_NUMBER}"
-			   	         git push https://${github-cred}@github.com/${GIT_USERNAME}/${GIT_REPONAME}HEAD:ops-branch1
+                    sh '''
+                    git config user.name "techprakashtp"
+		    git config user.email "jyotiprakashnk49@gmail.com"  
 
-        			        ''' 
+		    BUILD_NUMBER=${BUILD_NUMBER}
+                    echo $BUILD_NUMBER
+
+                    imageTag=$(grep -oP '(?<=frontend:)[^ ]+' deployment.yaml)
+                    echo $imageTag
+
+                    sed -i "s/${Image_Name}:${imageTag}/${Image_Name}:${BUILD_NUMBER}/" deployment.yaml  
+
+                    git add deployment.yaml
+
+                    git commit -m "Update deployment Image to version \${BUILD_NUMBER}"
+			
+                    git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
+
+        	   ''' 
                         }
                     }
                 }
