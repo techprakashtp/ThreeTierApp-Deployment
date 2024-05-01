@@ -70,12 +70,11 @@ pipeline {
 		    BUILD_NUMBER=${BUILD_NUMBER}
                     echo $BUILD_NUMBER
 
-                    sed -i "s/${IMAGE_NAME}/${IMAGE_NAME}:${BUILD_NUMBER}/" deployment.yaml  
+		    ImageTag=$(grep -oP '(?<=frontend:).*' deployment.yaml)
+                    sed -i "s/${IMAGE_NAME}:${ImageTag}/${IMAGE_NAME}:${BUILD_NUMBER}/" deployment.yaml  
 
                     git add deployment.yaml
-
                     git commit -m "Update deployment Image to version \${BUILD_NUMBER}"
-			
                     git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
         	     ''' 
