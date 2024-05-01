@@ -67,7 +67,6 @@ pipeline {
                     echo $BUILD_NUMBER
 
                     ImageTag=$(grep -oP '(?<=frontend:)[^ ]+' deployment.yaml)
-                    echo $ImageTag
 
                     sed -i "s/${IMAGE_NAME}:${ImageTag}/${IMAGE_NAME}:${BUILD_NUMBER}/" deployment.yaml  
 
