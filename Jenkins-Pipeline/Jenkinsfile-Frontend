@@ -55,6 +55,7 @@ pipeline {
 		  environment {
                   GIT_REPO_NAME = "ThreeTierApp-Deployment"
                   GIT_USER_NAME = "techprakashtp"
+                  IMAGE_TAG="${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
            	    }
             steps {
        	        script {
@@ -64,17 +65,13 @@ pipeline {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
 
                 sh '''
-                   git config user.name "techprakashtp"
-		   git config user.email "jyotiprakashnk49@gmail.com"  
+                    git config user.name "techprakashtp"
+		    git config user.email "jyotiprakashnk49@gmail.com"  
 
-		    BUILD_NUMBER=${BUILD_NUMBER}
-                    echo $BUILD_NUMBER
-
-		    ImageTag=$(grep -oP '(?<=frontend:).*' deployment.yaml)
-                    sed -i "s/${IMAGE_NAME}:${ImageTag}/${IMAGE_NAME}:${BUILD_NUMBER}/" deployment.yaml  
-
+                    sed -i 's/PLACEHOLDER_TAG/${IMAGE_TAG}/g' deployment.yaml 
                     git add deployment.yaml
-                    git commit -m "Update deployment Image to version \${BUILD_NUMBER}"
+
+                    git commit -m "Update k8s deployment manifest file Image to version \${IMAGE_TAG}"
                     git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
         	     ''' 
