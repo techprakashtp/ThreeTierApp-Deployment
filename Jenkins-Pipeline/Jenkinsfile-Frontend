@@ -53,7 +53,7 @@ pipeline {
 
         stage('UpdateManifest') {
 		  environment {
-                  GIT_REPO_NAME = "ThreeTierApp-Deployment"
+                  GIT_REPO_NAME = "ThreeTierApp-Deployment.git"
                   GIT_USER_NAME = "techprakashtp"
                   IMAGE_TAG="${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
            	    }
@@ -69,10 +69,11 @@ pipeline {
 		    git config user.email "jyotiprakashnk49@gmail.com"  
 
                     sed -i 's/${IMAGE_NAME}:${PLACEHOLDER_TAG}/${IMAGE_NAME}:${IMAGE_TAG}/g' deployment.yaml 
-                    git add deployment.yaml
+		    cat deployment.yaml 
+                    git add .
 
                     git commit -m "Update k8s deployment manifest file Image to version \${IMAGE_TAG}"
-                    git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
+                    git push https://${GIT_USER_NAME}:${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
         	     ''' 
                         }
