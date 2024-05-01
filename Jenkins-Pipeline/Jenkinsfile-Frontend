@@ -74,7 +74,7 @@ pipeline {
                       checkout scmGit(branches: [[name: '*/ops-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
 
                     dir('K8S-Manifest/Frontend') {
-                        withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 	
+                        withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
 
                                       sh '''
                     	  	 	 git config user.name "techprakashtp"
@@ -84,7 +84,7 @@ pipeline {
 			   		
 			   		 git add deployment.yaml
 			   		 git commit -m "changed manifest done by jenkins job \${BUILD_NUMBER}"
-			   	         git push https://${github_token}@github.com/${GIT_USERNAME}/${GIT_REPONAME}HEAD:ops-branch1
+			   	         git push https://${github-cred}@github.com/${GIT_USERNAME}/${GIT_REPONAME}HEAD:ops-branch1
 
         			        ''' 
                         }
