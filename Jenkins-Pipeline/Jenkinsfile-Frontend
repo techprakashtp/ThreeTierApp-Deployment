@@ -33,7 +33,7 @@ pipeline {
                 script {  
                     dir('ToDo-Frontend-App') {
                     def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}"
-                    docker.build "${IMAGE_NAME}:${buildVersion}"
+                    docker.build "${IMAGE_NAME}:${IMAGE_TAG}"
                     echo 'Build Image Completed'   
 		            }
                 }
