@@ -22,7 +22,7 @@ pipeline {
        	       script {
                     checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
                         
-          	     }git add -A
+          	     }
             	}
        	    }  	
 
