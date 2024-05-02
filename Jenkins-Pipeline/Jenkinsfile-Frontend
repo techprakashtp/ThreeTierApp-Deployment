@@ -70,7 +70,7 @@ pipeline {
 
                     sed -i 's/${IMAGE_NAME}:${PLACEHOLDER_TAG}/${IMAGE_NAME}:${IMAGE_TAG}/g' deployment.yaml 
 		    cat deployment.yaml 
-                    git add --all
+                    git add -A
                     git commit -m "Update k8s deployment manifest file Image to version \${IMAGE_TAG}"
                     git push https://${GIT_USER_NAME}:${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
