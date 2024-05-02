@@ -45,7 +45,7 @@ pipeline {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                     def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}"
-                    docker.image("${IMAGE_NAME}:${buildVersion}").push()
+                    docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
                     echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
