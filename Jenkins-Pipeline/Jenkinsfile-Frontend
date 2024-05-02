@@ -13,7 +13,8 @@ pipeline {
     	  CONTAINER_NAME = 'todofrontend-container'
     	  GITHUB_CRED = credentials('github-cred')
     	  DOCKERHUB_CRED_ = credentials('docker-hub-cred')
-	      SCANNER_HOME= tool 'sonarqube'
+	  SCANNER_HOME= tool 'sonarqube'
+          IMAGE_TAG="${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
   	    }
   
     stages {         
@@ -55,7 +56,7 @@ pipeline {
 		  environment {
                   GIT_REPO_NAME = "ThreeTierApp-Deployment.git"
                   GIT_USER_NAME = "techprakashtp"
-                  IMAGE_TAG="${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
+                  
            	    }
             steps {
        	        script {
@@ -86,7 +87,7 @@ pipeline {
 
         stage('Running Image') {
             steps {
-              sh "docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${BUILD_NUMBER}"
+              sh "docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${IMAGE_TAG}"
             }         
         }
         
