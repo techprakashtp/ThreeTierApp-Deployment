@@ -75,7 +75,7 @@ pipeline {
 		    cat deployment.yaml 
                     
                     git commit -am "Update k8s deployment manifest file Image to version \${IMAGE_TAG}"
-                    git push https:${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
+                    git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
         	     ''' 
                         }
