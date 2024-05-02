@@ -1,3 +1,8 @@
-**/*.cache
-../temp/
-../../temp
+../*.cache
+../*.temp
+../../*.temp
+../../*.cache
+
+../Frontend@tmp/
+	../../ToDo-Backend-App/
+	../../ToDo-Frontend-App/
