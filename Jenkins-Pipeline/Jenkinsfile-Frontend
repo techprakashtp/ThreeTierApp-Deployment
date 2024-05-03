@@ -71,15 +71,15 @@ pipeline {
 		    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
-			
+			sh "echo ${BASE_VERSION}.${BUILD_NUMBER}"
                 sh '''
                     git config user.name "techprakashtp"
 		    git config user.email "jyotiprakashnk49@gmail.com"  
 		    echo 'Full Version No: ${fullVersion}'
 		    git config clean.requireForce false
 		    git clean -f
-		    echo '${params.BASE_VERSION}.${env.BUILD_NUMBER}'
-		    sed -i 's+jprakash1/todoapp-frontend.*+jprakash1/todoapp-frontend:${params.BASE_VERSION}.${env.BUILD_NUMBER}+g' deployment.yaml
+		    
+		    sed -i 's+jprakash1/todoapp-frontend.*+jprakash1/todoapp-frontend:1+g' deployment.yaml
                     
 		    cat deployment.yaml 
 		    git add -A
