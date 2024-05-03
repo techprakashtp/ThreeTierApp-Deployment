@@ -68,14 +68,14 @@ pipeline {
             steps {
        	        script {
                       checkout scmGit(branches: [[name: '*/ops-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-
+		    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
-			def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+			
                 sh '''
                     git config user.name "techprakashtp"
 		    git config user.email "jyotiprakashnk49@gmail.com"  
-
+		    echo 'Full Version No: ${fullVersion}'
 		    git config clean.requireForce false
 		    git clean -f
 		    echo '${params.BASE_VERSION}.${env.BUILD_NUMBER}'
