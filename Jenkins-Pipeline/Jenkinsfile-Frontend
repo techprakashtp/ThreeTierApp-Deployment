@@ -71,7 +71,7 @@ pipeline {
 
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
-
+			def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                 sh '''
                     git config user.name "techprakashtp"
 		    git config user.email "jyotiprakashnk49@gmail.com"  
