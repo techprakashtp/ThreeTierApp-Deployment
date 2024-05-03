@@ -9,13 +9,10 @@ pipeline {
 
   	environment {
     	  IMAGE_NAME='jprakash1/todoapp-frontend'
-          MAJOR_VERSION='1'
-          MINOR_VERSION='0'
     	  CONTAINER_NAME = 'todofrontend-container'
     	  GITHUB_CRED = credentials('github-cred')
     	  DOCKERHUB_CRED_ = credentials('docker-hub-cred')
 	  SCANNER_HOME= tool 'sonarqube'
-          IMAGE_TAG="${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
   	    }
 
   	parameters {
@@ -83,7 +80,7 @@ pipeline {
 		    git clean -f
 		   
 		    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
-		    sed -i 's/${IMAGE_NAME}:${IMAGE_VERSION}/${IMAGE_NAME}:${fullVersion}/g' deployment.yaml
+		    sed -i 's/${IMAGE_NAME}:${BASE_VERSION/${IMAGE_NAME}:${fullVersion}/g' deployment.yaml
                     
 		    cat deployment.yaml 
 		    git add -A
