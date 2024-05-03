@@ -1,3 +1,9 @@
++ git config user.name techprakashtp
++ git config user.email jyotiprakashnk49@gmail.com
++ git config clean.requireForce false
++ git clean -f
++ sed -i s+jprakash1/todoapp-frontend.*+jprakash1/todoapp-frontend:${params.BASE_VERSION}.${env.BUILD_NUMBER}+g deployment.yaml
++ cat deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,3 +50,4 @@ spec:
   type: ClusterIP
   selector:
     role: frontend
++ git add -A
