@@ -79,8 +79,8 @@ pipeline {
 		    git config clean.requireForce false
 		    git clean -f
 
-		    sh "echo ${BASE_VERSION}.${BUILD_NUMBER}"
-		    sed -i 's/${IMAGE_NAME}:${BASE_VERSION}.${BUILD_NUMBER}/${IMAGE_NAME}:${BASE_VERSION}.${BUILD_NUMBER}/g' deployment.yaml
+		    sh "echo ${fullVersion}"
+		    sed -i 's/jprakash1/todoapp-frontend:${BASE_VERSION}.${BUILD_NUMBER}/jprakash1/todoapp-frontend:${BASE_VERSION}.${BUILD_NUMBER}/g' deployment.yaml
                     
 		    cat deployment.yaml 
 		    git add -A
