@@ -79,7 +79,6 @@ pipeline {
 		    git config clean.requireForce false
 		    git clean -f
 		   
-		    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
 		    sed -i 's/${IMAGE_NAME}:${BASE_VERSION/${IMAGE_NAME}:${fullVersion}/g' deployment.yaml
                     
 		    cat deployment.yaml 
