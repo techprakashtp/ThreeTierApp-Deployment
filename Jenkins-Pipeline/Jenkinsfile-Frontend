@@ -1,3 +1,4 @@
+
 pipeline {
      agent any
 
@@ -16,7 +17,16 @@ pipeline {
 	  SCANNER_HOME= tool 'sonarqube'
           IMAGE_TAG="${env.MAJOR_VERSION}.${env.MINOR_VERSION}.${env.BUILD_NUMBER}"
   	    }
-  
+
+  	parameters {
+        string(
+            name: 'BASE_VERSION',
+            defaultValue: '1.0',
+            description: 'Enter the base version for the Docker image'
+        )
+    }
+
+
     stages {         
         stage('Checkout Git') {
             steps {
@@ -31,9 +41,9 @@ pipeline {
         stage('Build Image') {         
             steps{  
                 script {  
-                    dir('ToDo-Frontend-App') {
-                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}"
-                    docker.build "${IMAGE_NAME}:${BUILD_NUMBER}"
+                    dir('ToDo-Frontend-App') {         
+                    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+                    docker.build "${IMAGE_NAME}:${fullVersion} "
                     echo 'Build Image Completed'   
 		            }
                 }
@@ -44,8 +54,8 @@ pipeline {
             steps {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
-                    def buildVersion = "${env.MAJOR_VERSION}.${env.MINOR_VERSION}"
-                    docker.image("${IMAGE_NAME}:${BUILD_NUMBER}").push()
+                    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+                    docker.image("${IMAGE_NAME}:${fullVersion}").push()
                     echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
@@ -72,8 +82,9 @@ pipeline {
 		    git config clean.requireForce false
 		    git clean -f
 		    git rm -r --cached .
-		    
-                    sed -i 's/${IMAGE_NAME}:${PLACEHOLDER_TAG}/${IMAGE_NAME}:${BUILD_NUMBER}/g' deployment.yaml 
+		    		def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+		    		sed -i 's/version:.*/version: ${fullVersion}/' deployment.yaml 
+                    
 		    cat deployment.yaml 
 		    git add -A
 		    
