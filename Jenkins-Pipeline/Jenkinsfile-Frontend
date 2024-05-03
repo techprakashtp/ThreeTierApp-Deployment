@@ -80,7 +80,7 @@ pipeline {
 		    git clean -f
 
 		    sh "echo ${BASE_VERSION}.${BUILD_NUMBER}"
-		    sh "sed -i 's/BASE_VERSION:.*/BASE_VERSION: ${BASE_VERSION}.${BUILD_NUMBER}/' deployment.yaml"
+		    sed -i 's/${IMAGE_NAME}:${BASE_VERSION}.${BUILD_NUMBER}/${IMAGE_NAME}:${BASE_VERSION}.${BUILD_NUMBER}/g' deployment.yaml
                     
 		    cat deployment.yaml 
 		    git add -A
