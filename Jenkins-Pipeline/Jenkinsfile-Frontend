@@ -84,8 +84,9 @@ pipeline {
 		    git config clean.requireForce false
 		    git clean -f
 
+		    echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in Update Manifest Stage SED CMD "
 		    sed -i 's|{{IMAGE_NAME}}:{{BASE_VERSION}}.{{BUILD_NUMBER}}|${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER}|g' deployment.yaml
-                    echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in Update Manifest Stage SED CMD "
+                    echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in SED CMD "
 
 		    cat deployment.yaml 
 		    git add -A
