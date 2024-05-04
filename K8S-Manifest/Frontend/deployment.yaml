@@ -21,8 +21,8 @@ spec:
       labels:
         role: frontend
       containers:
-      - name: todoapp-frontend:${BASE_VERSION}
-        image: jprakash1/todoapp-frontend:${BASE_VERSION}.${BUILD_NUMBER}
+      - name: todoapp-frontend
+        image: jprakash1/todoapp-frontend:{{BASE_VERSION}}
         imagePullPolicy: Always
         env:
           - name: REACT_APP_BACKEND_URL
