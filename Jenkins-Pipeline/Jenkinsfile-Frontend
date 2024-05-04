@@ -84,7 +84,7 @@ pipeline {
 		    git config clean.requireForce false
 		    git clean -f
 
-		    sed -i 's|{{IMAGE_NAME}}:{{BASE_VERSION}}|${IMAGE_NAME}:${params.BASE_VERSION}|g' deployment.yaml
+		    sed -i 's|{{IMAGE_NAME}}:{{BASE_VERSION}}|${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER}|g' deployment.yaml
                     
 		    cat deployment.yaml 
 		    git add -A
