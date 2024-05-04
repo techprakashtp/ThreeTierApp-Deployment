@@ -41,7 +41,8 @@ pipeline {
                     dir('ToDo-Frontend-App') {         
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     sh "docker build -t ${IMAGE_NAME}:${fullVersion} ."   
-                    echo 'Build Image Version ${fullVersion} Completed'   
+                    echo "Docker Image of Build Number ${BUILD_NUMBER} Build Completed"
+		    echo "Docker Image of Version ${params.BASE_VERSION}.${BUILD_NUMBER} Push to Docker Hub Completed"
 		            }
                 }
             }
@@ -53,7 +54,7 @@ pipeline {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     docker.image("${IMAGE_NAME}:${fullVersion}").push()
-                    echo 'Push Docker Image of Version ${fullVersion} to Docker Hub Completed'
+                    
                     }
                 }
             }
