@@ -18,7 +18,7 @@ pipeline {
   	parameters {
         string(
             name: 'BASE_VERSION',
-            defaultValue: '3.0',
+            defaultValue: '1.0.0',
             description: 'Enter the base version for the Docker image'
         )
     }
@@ -40,7 +40,7 @@ pipeline {
                 script {  
                     dir('ToDo-Frontend-App') {         
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
-                    sh "docker build -t ${IMAGE_NAME}:${params.BASE_VERSION} ."   
+                    sh "docker build -t ${IMAGE_NAME}:${fullVersion} ."   
                     echo 'Build Image Completed'   
 		            }
                 }
@@ -52,7 +52,7 @@ pipeline {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
-                    docker.image("${IMAGE_NAME}:${params.BASE_VERSION}").push()
+                    docker.image("${IMAGE_NAME}:${fullVersion}").push()
                     echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
@@ -63,16 +63,18 @@ pipeline {
 		  environment {
                   GIT_REPO_NAME = "ThreeTierApp-Deployment.git"
                   GIT_USER_NAME = "techprakashtp"
-                  IMAGE_NAME="jprakash1/todoapp-frontend"
            	    }
             steps {
        	        script {
                       checkout scmGit(branches: [[name: '*/ops-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-		    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
+
+			sh "Build Number ${BUILD_NUMBER}"
+			sh "Param Base Version ${params.BASE_VERSION}"
+			sh "echo Image Name ${IMAGE_NAME}"	
 			
-                sh '''
+                 sh '''
                     git config user.name "techprakashtp"
 		    git config user.email "jyotiprakashnk49@gmail.com"  
 		    
@@ -84,7 +86,7 @@ pipeline {
 		    cat deployment.yaml 
 		    git add -A
 		    
-                    git commit -m "Update k8s deployment manifest file Image to version \${BUILD_NUMBER}"
+                    git commit -m "Update k8s deployment manifest file Image to version ${params.BASE_VERSION}.${BUILD_NUMBER}"
                     git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
         	     ''' 
