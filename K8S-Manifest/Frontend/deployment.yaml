@@ -22,7 +22,7 @@ spec:
         role: frontend
       containers:
       - name: todoapp-frontend
-        image: ${IMAGE_NAME}:${params.BASE_VERSION}
+        image: {{IMAGE_NAME}}:{{BASE_VERSION}}.{{BUILD_NUMBER}}
         imagePullPolicy: Always
         env:
           - name: REACT_APP_BACKEND_URL
