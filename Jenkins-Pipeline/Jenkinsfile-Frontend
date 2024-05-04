@@ -46,7 +46,7 @@ pipeline {
                     dir('ToDo-Frontend-App') {         
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     sh "docker build -t ${IMAGE_NAME}:${fullVersion} ."   
-                    echo "Docker Image of Version ${params.BASE_VERSION}.${BUILD_NUMBER} Image Build Completed"
+                    echo "Docker Image of Version ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} Image Build Completed"
 
 		    }
                 }
@@ -59,7 +59,7 @@ pipeline {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     docker.image("${IMAGE_NAME}:${fullVersion}").push()
-                    echo "Docker Image of Version ${params.BASE_VERSION}.${BUILD_NUMBER} Image Push to Docker Hub Completed"
+                    echo "Docker Image of Version ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} Image Push to Docker Hub Completed"
                     }
                 }
             }
@@ -79,22 +79,17 @@ pipeline {
 			echo "Build Number ${BUILD_NUMBER} in UpdateManifest Stage"
 			echo "Full Version Number ${params.BASE_VERSION}.${BUILD_NUMBER} in UpdateManifest Stage"
 			echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in UpdateManifest Stage"
-								   
-                 sh '''
-		    git config clean.requireForce false
-		    git clean -f
 
-		    echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in Update Manifest Stage SED CMD "
-		    sed -i 's|{{IMAGE_NAME}}:{{BASE_VERSION}}.{{BUILD_NUMBER}}|${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER}|g' deployment.yaml
-                    echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in SED CMD "
+		     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+		     sh "sed -i 's|image:${IMAGE_NAME}:.*|image:${IMAGE_NAME}:${fullVersion}|g' deployment.yaml"	
 
-		    cat deployment.yaml 
-		    git add -A
-		    
-                    git commit -m "Update k8s deployment manifest file Image to version ${params.BASE_VERSION}.${BUILD_NUMBER}"
-                    git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
+		     cat deployment.yaml 
+		     sh "git add -A"
 
-        	     ''' 
+                    sh "git commit -am 'Update k8s deployment manifest file Image to version ${params.BASE_VERSION}.${BUILD_NUMBER}' "
+                    sh "git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1"
+
+                 
                     }
                 }
             }
