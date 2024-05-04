@@ -81,7 +81,9 @@ pipeline {
 			echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in UpdateManifest Stage"
 
 		     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
-		     sh "sed -i 's+jprakash1/todoapp-frontend.*+jprakash1/todoapp-frontend:${params.BASE_VERSION}.${BUILD_NUMBER}+g' deployment.yaml"
+
+		     cat deployment.yaml 
+		     sh "sed -i 's+jprakash1/todoapp-frontend.*+jprakash1/todoapp-frontend:${fullVersion}+g' deployment.yaml"
 		     	
 		     cat deployment.yaml 
 		     sh "git add -A"
