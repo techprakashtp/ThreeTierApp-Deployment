@@ -22,7 +22,7 @@ spec:
         role: frontend
       containers:
       - name: todoapp-frontend
-        image: jprakash1/todoapp-frontend:2.0.159
+        image: jprakash1/todoapp-frontend:2.0.160
         imagePullPolicy: Always
         env:
           - name: REACT_APP_BACKEND_URL
