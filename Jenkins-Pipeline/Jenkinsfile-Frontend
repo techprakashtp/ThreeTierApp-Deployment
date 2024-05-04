@@ -18,7 +18,7 @@ pipeline {
   	parameters {
         string(
             name: 'BASE_VERSION',
-            defaultValue: '1.0.0',
+            defaultValue: '1.0',
             description: 'Enter the base version for the Docker image'
         )
     }
@@ -84,7 +84,7 @@ pipeline {
 		    git config clean.requireForce false
 		    git clean -f
 
-		    sed -i 's|{{IMAGE_NAME}}:{{BASE_VERSION}}|${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER}|g' deployment.yaml
+		    sed -i 's|{{IMAGE_NAME}}:{{BASE_VERSION}}.{{BUILD_NUMBER}}|${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER}|g' deployment.yaml
                     
 		    cat deployment.yaml 
 		    git add -A
