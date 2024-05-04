@@ -63,7 +63,7 @@ pipeline {
 		  environment {
                   GIT_REPO_NAME = "ThreeTierApp-Deployment.git"
                   GIT_USER_NAME = "techprakashtp"
-                  
+                  IMAGE_NAME="jprakash1/todoapp-frontend"
            	    }
             steps {
        	        script {
