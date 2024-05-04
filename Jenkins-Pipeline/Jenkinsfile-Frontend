@@ -41,7 +41,7 @@ pipeline {
                     dir('ToDo-Frontend-App') {         
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     sh "docker build -t ${IMAGE_NAME}:${fullVersion} ."   
-                    echo 'Build Image Completed'   
+                    echo 'Build Image Version ${fullVersion} Completed'   
 		            }
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     docker.image("${IMAGE_NAME}:${fullVersion}").push()
-                    echo 'Push Docker Image to Docker Hub Completed'
+                    echo 'Push Docker Image of Version ${fullVersion} to Docker Hub Completed'
                     }
                 }
             }
@@ -69,11 +69,12 @@ pipeline {
                       checkout scmGit(branches: [[name: '*/ops-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
                     dir('K8S-Manifest/Frontend') {
                         withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
-
-			sh "Build Number ${BUILD_NUMBER}"
-			sh "Param Base Version ${params.BASE_VERSION}"
-			sh "echo Image Name ${IMAGE_NAME}"	
 			
+			sh "Build Number ${BUILD_NUMBER}"
+			sh "echo Image Name ${IMAGE_NAME}"	
+			sh "Param Base Version ${params.BASE_VERSION}"
+			def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+
                  sh '''
                     git config user.name "techprakashtp"
 		    git config user.email "jyotiprakashnk49@gmail.com"  
