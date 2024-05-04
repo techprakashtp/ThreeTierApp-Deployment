@@ -52,7 +52,7 @@ pipeline {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
-                    docker.image("${IMAGE_NAME}:${params.BASE_VERSION}.push()
+                    docker.image("${IMAGE_NAME}:${params.BASE_VERSION}").push()
                     echo 'Push Docker Image to Docker Hub Completed'
                     }
                 }
