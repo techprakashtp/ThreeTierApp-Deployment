@@ -29,11 +29,16 @@ pipeline {
             steps {
        	       script {
                     checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-                        
+                     withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 
+		    sh '''
+                    git config user.name "techprakashtp"
+		    git config user.email "jyotiprakashnk49@gmail.com"  
+
+		   ''' 
           	     }
             	}
        	    }  	
-
+	}	
         
         stage('Build Image') {         
             steps{  
@@ -42,8 +47,8 @@ pipeline {
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     sh "docker build -t ${IMAGE_NAME}:${fullVersion} ."   
                     echo "Docker Image of Build Number ${BUILD_NUMBER} Build Completed"
-		    echo "Docker Image of Version ${params.BASE_VERSION}.${BUILD_NUMBER} Push to Docker Hub Completed"
-		            }
+
+		    }
                 }
             }
         }
@@ -54,7 +59,7 @@ pipeline {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
                     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
                     docker.image("${IMAGE_NAME}:${fullVersion}").push()
-                    
+                    echo "Docker Image of Version ${params.BASE_VERSION}.${BUILD_NUMBER} Push to Docker Hub Completed"
                     }
                 }
             }
@@ -68,18 +73,13 @@ pipeline {
             steps {
        	        script {
                       checkout scmGit(branches: [[name: '*/ops-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-                    dir('K8S-Manifest/Frontend') {
-                        withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 	
-			
-			sh "Build Number ${BUILD_NUMBER}"
-			sh "echo Image Name ${IMAGE_NAME}"	
-			sh "Param Base Version ${params.BASE_VERSION}"
-			def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+                       	
+			dir('K8S-Manifest/Frontend') {
+
+			echo "Build Number ${BUILD_NUMBER} in UpdateManifest Stage"
+			echo "Full Version Number ${params.BASE_VERSION}.${BUILD_NUMBER} in UpdateManifest Stage"
 
                  sh '''
-                    git config user.name "techprakashtp"
-		    git config user.email "jyotiprakashnk49@gmail.com"  
-		    
 		    git config clean.requireForce false
 		    git clean -f
 
@@ -92,7 +92,6 @@ pipeline {
                     git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1
 
         	     ''' 
-                        }
                     }
                 }
             }
