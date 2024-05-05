@@ -4,10 +4,10 @@ metadata:
   name: frontend
   namespace: three-tier
   labels:
-    role: frontend
-    env: demo
+    app: frontend
+  
 spec: 
-  replicas: 1
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -15,11 +15,12 @@ spec:
       maxUnavailable: 25%
   selector:
     matchLabels: 
-      role: frontend
+      app: frontend
   template:
     metadata:
       labels:
-        role: frontend
+        app: frontend
+    spec:
       containers:
       - name: frontend
         image: jprakash1/todoapp-frontend:1.0.0.166
@@ -43,4 +44,4 @@ spec:
     protocol: TCP
   type: ClusterIP
   selector:
-    role: frontend
+    app.kubernetes.io/name: frontend
