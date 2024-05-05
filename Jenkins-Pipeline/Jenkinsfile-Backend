@@ -1,80 +1,111 @@
+
 pipeline {
      agent any
 
       tools{
 	     jdk  'jdk17'
 	     maven 'maven3'
-	   }
+	    }
 
   	environment {
-    	  Repo_Name='jprakash1/todoapp-backend'
-    	  Container_Name = 'my-container-backend'
-    	  IMAGE_TAG='v2.0'
-    	  GITHUB_TOKEN = credentials('github_token')
-    	  DOCKERHUB_TOKEN = credentials('docker-hub-cred')
+    	  IMAGE_NAME='jprakash1/todoapp-backend'
+    	  CONTAINER_NAME = 'todoapp-backend-container'
+    	  GITHUB_CRED = credentials('github-cred')
+    	  DOCKERHUB_CRED_ = credentials('docker-hub-cred')
 	  SCANNER_HOME= tool 'sonarqube'
-  	 }
-  
- stages {         
-    stage('Checkout Git') {
-        steps {
-       	    script {
-             checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
-                    withCredentials([gitUsernamePassword(credentialsId: 'github_token', gitToolName: 'Git')]) { 
-                      sh '''
-                    	   git config --global user.name "techprakashtp"
-			                   git config --global user.email "jyotiprakashnk49@gmail.com"  
-        		           ''' 
-                        }
-          	    }
+  	    }
+
+  	parameters {
+        string(
+            name: 'BASE_VERSION',
+            defaultValue: '1.0.0',
+            description: 'Enter the base version for the Docker image'
+        )
+    }
+
+
+    stages {         
+        stage('Checkout Git') {
+            steps {
+       	       script {
+                    checkout scmGit(branches: [[name: '*/dev-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
+                     withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Git')]) { 
+		    sh '''
+                    git config user.name "techprakashtp"
+		    git config user.email "jyotiprakashnk49@gmail.com"  
+
+		   ''' 
+          	     }
             	}
        	    }  	
+	}	
+        
+        stage('Build Image') {         
+            steps{  
+                script {  
+                    dir('ToDo-Backend-App') {         
+                    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+                    sh "docker build -t ${IMAGE_NAME}:${fullVersion} ."   
+                    echo "Docker Image of Version ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} Image Build Completed"
 
-     stage('SonarQube Analysis') {
-            steps {
-            	dir('ToDo-Backend-App') {
-                    withSonarQubeEnv('sonarqube') {
-       sh ''' 
-       	 $SCANNER_HOME/bin/sonar-scanner \
- 			  -Dsonar.projectKey=ThreeTierApp-Deployment \
- 			  -Dsonar.projectName=ThreeTierApp-Deployment 
-  			 '''
 		    }
                 }
             }
         }
-
-    stage('Build Image') {         
-             steps{  
-                 script {  
-                     dir('ToDo-Backend-App') {
-                        docker.build "${Repo_Name}:${BUILD_NUMBER}"
-                        echo 'Build Image Completed'   
-		   }
-                }
-            }
-        }
 		
-        stage('Push to DockerHub') {
+        stage('Push Image') {
             steps {
                 script {
                	    withDockerRegistry(credentialsId: 'docker-hub-cred', toolName: 'Docker') {
-                        docker.image("${Repo_Name}:${BUILD_NUMBER}").push()
-                        echo 'Push Docker Image to Docker Hub Completed'
+                    def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+                    docker.image("${IMAGE_NAME}:${fullVersion}").push()
+                    echo "Docker Image of Version ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} Image Push to Docker Hub Completed"
                     }
                 }
             }
     	}
 
+        stage('UpdateManifest') {
+		  environment {
+                  GIT_REPO_NAME = "ThreeTierApp-Deployment.git"
+                  GIT_USER_NAME = "techprakashtp"
+           	    }
+            steps {
+       	        script {
+                      checkout scmGit(branches: [[name: '*/ops-branch1']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/techprakashtp/ThreeTierApp-Deployment.git']])
+                       	
+			dir('K8S-Manifest/Backend') {
+
+			echo "Build Number ${BUILD_NUMBER} in UpdateManifest Stage"
+			echo "Full Version Number ${params.BASE_VERSION}.${BUILD_NUMBER} in UpdateManifest Stage"
+			echo "Images Name With Full Version Number ${IMAGE_NAME}:${params.BASE_VERSION}.${BUILD_NUMBER} in UpdateManifest Stage"
+
+		     def fullVersion = "${params.BASE_VERSION}.${env.BUILD_NUMBER}"
+
+		     sh "cat deployment.yaml"
+		     sh "sed -i 's+${IMAGE_NAME}.*+${IMAGE_NAME}:${params.BASE_VERSION}.${env.BUILD_NUMBER}+g' deployment.yaml"
+		     	
+		     sh "cat deployment.yaml"
+		     sh "git add -A"
+
+                    sh "git commit -am 'Update k8s backend deployment manifest file Image to version ${params.BASE_VERSION}.${BUILD_NUMBER}' "
+                    sh "git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1"
+
+                 
+                    }
+                }
+            }
+        } 
+
         stage('Running Image') {
             steps {
-              sh "docker run -d --name ${Container_Name} ${Repo_Name}:${BUILD_NUMBER}"
+              sh "docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${params.BASE_VERSION}.${env.BUILD_NUMBER}"
             }         
         }
         
         stage('Stop Container') {
             steps {
-               sh "docker stop ${Container_Name}"
+               sh "docker stop ${CONTAINER_NAME}"
             }           
         }    	
     }
