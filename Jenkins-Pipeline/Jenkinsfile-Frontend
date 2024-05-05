@@ -9,7 +9,7 @@ pipeline {
 
   	environment {
     	  IMAGE_NAME='jprakash1/todoapp-frontend'
-    	  CONTAINER_NAME = 'todofrontend-container'
+    	  CONTAINER_NAME = 'todoapp-frontend-container'
     	  GITHUB_CRED = credentials('github-cred')
     	  DOCKERHUB_CRED_ = credentials('docker-hub-cred')
 	  SCANNER_HOME= tool 'sonarqube'
@@ -99,7 +99,7 @@ pipeline {
 
         stage('Running Image') {
             steps {
-              sh "docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${IMAGE_TAG}"
+              sh "docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${params.BASE_VERSION}.${env.BUILD_NUMBER}"
             }         
         }
         
