@@ -88,7 +88,7 @@ pipeline {
 		     sh "cat deployment.yaml"
 		     sh "git add -A"
 
-                    sh "git commit -am 'Update k8s deployment manifest file Image to version ${params.BASE_VERSION}.${BUILD_NUMBER}' "
+                    sh "git commit -am 'Update k8s frontend deployment manifest file Image to version ${params.BASE_VERSION}.${BUILD_NUMBER}' "
                     sh "git push https://${GITHUB_CRED}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:ops-branch1"
 
                  
