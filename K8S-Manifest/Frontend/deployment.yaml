@@ -21,7 +21,7 @@ spec:
       labels:
         role: frontend
       containers:
-      - name: todoapp-frontend
+      - name: frontend
         image: jprakash1/todoapp-frontend:1.0.0.166
         imagePullPolicy: Always
         env:
