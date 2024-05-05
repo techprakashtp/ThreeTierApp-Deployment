@@ -36,12 +36,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata: 
+  labels:
+    app: frontend
   name: frontend
   namespace: three-tier
 spec:
   ports:
   - port: 3000
     protocol: TCP
-  type: ClusterIP
+    targetPort: 3000
   selector:
     app.kubernetes.io/name: frontend
+  type: NodePort
