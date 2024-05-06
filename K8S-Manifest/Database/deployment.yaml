@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
+  labels:
+    app: mongodb
   namespace: three-tier
   name: mongodb
 spec: 
@@ -14,7 +16,7 @@ spec:
         app: mongodb
     spec: 
       containers:
-      - name: mon
+      - name: mongo
         image: mongo:4.4.6
         command:
             - "numactl"
