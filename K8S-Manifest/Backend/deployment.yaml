@@ -4,7 +4,7 @@ metadata:
   name: api
   namespace: three-tier
   labels: 
-    role: api
+    app: api
     env: demo
 spec: 
   replicas: 2
@@ -15,11 +15,11 @@ spec:
       maxUnavailable: 25%
   selector: 
     matchLabels:
-      role: api
+      app: api
   template:
     metadata:
       labels:
-        role: api
+        app: api
     
       containers:
       - name: api
@@ -67,4 +67,4 @@ spec:
     protocol: TCP
   type: ClusterIP
   selector:
-    role: api
+    app: api
