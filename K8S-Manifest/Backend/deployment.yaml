@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: jprakash1/todoapp-backend:1.0.0.167
+        image: jprakash1/todoapp-backend:1.0.0.169
         imagePullPolicy: Always
         env:
           - name: MONGO_CONN_STR
