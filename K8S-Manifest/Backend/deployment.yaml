@@ -5,7 +5,6 @@ metadata:
   namespace: three-tier
   labels: 
     app: api
-    env: demo
 spec: 
   replicas: 2
   strategy: 
@@ -20,7 +19,7 @@ spec:
     metadata:
       labels:
         app: api
-    
+    spec:
       containers:
       - name: api
         image: jprakash1/todoapp-backend:1.0.0.167
@@ -59,12 +58,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: api
   name: api
   namespace: three-tier
 spec: 
   ports:
   - port: 3500
     protocol: TCP
+    targetPort: 3500
   type: ClusterIP
   selector:
     app: api
+  type: NodePort
