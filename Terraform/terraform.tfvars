@@ -1,6 +1,6 @@
-vpc-name      = "Jenkins-vpc"
+vpc-name      = "Jenkins-Vpc"
 igw-name      = "Jenkins-igw"
-subnet-name   = "Jenkins-subnet"
+subnet-name   = "Jenkins-Subnet"
 rt-name       = "Jenkins-route-table"
 sg-name       = "Jenkins-sg"
 instance-name = "Jenkins-Instance"

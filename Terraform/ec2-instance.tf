@@ -1,9 +1,9 @@
 
-resource "aws_instance" "ec2_instance" {
+resource "aws_instance" "instance_type" {
 
   ami = data.aws_ami.ami.id
   
-  instance_type = "t2.small"
+  instance_type = var.instance_type
   
   key_name = var.key-name
   
@@ -24,4 +24,5 @@ resource "aws_instance" "ec2_instance" {
   tags = {
     Name = var.instance-name
   }
+  
 }
